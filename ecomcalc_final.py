@@ -28,12 +28,24 @@ ganancia = precio_venta - costo_total
 margen = (ganancia / precio_venta) * 100 if precio_venta != 0 else 0
 punto_equilibrio = costo_total / (precio_venta - costo_total) if (precio_venta - costo_total) > 0 else float('inf')
 
+# Evaluación automática
+if ganancia < 0:
+    evaluacion = "🔴 Este producto genera pérdidas. Revisa tus costos."
+elif margen < 15:
+    evaluacion = "🟡 Producto con baja rentabilidad. Podrías ajustar precio o reducir costos."
+else:
+    evaluacion = "🟢 Producto rentable. ¡Puedes escalarlo!"
+
 # Resultados
 st.markdown("## 📊 Resultados de la Simulación")
 col1, col2, col3 = st.columns(3)
 col1.metric("💰 Ganancia por unidad", f"${ganancia:,.0f}")
 col2.metric("📈 Margen de utilidad", f"{margen:.2f}%")
 col3.metric("⚖️ Punto de equilibrio (aprox. unidades)", f"{round(punto_equilibrio, 1)}" if punto_equilibrio != float('inf') else "No rentable")
+
+# Evaluación tipo semáforo
+st.markdown("### 🚦 Evaluación del Producto")
+st.info(evaluacion)
 
 # Gráfico de componentes (%)
 st.markdown("### 🧮 Distribución de Costos y Ganancia (% del precio de venta)")
@@ -94,6 +106,7 @@ def generar_pdf():
     pdf.ln(10)
     for k, v in sim_actual.items():
         pdf.cell(200, 10, txt=f"{k}: {v}", ln=True)
+    pdf.multi_cell(200, 10, txt=f"Evaluación: {evaluacion}")
     return pdf.output(dest="S").encode("latin-1")
 
 if st.button("📄 Descargar PDF"):
